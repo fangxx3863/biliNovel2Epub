@@ -1,0 +1,9 @@
+rich
+bs4
+urllib
+ebooklib
+uuid
+download
+ssl
+PIL
+io
