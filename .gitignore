@@ -131,3 +131,4 @@ dmypy.json
 # my
 *.epub
 test*
+.DS_Store
