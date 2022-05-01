@@ -151,6 +151,7 @@ def 写到书本(title, author, content, cover_name, cover_file, imgDir, folder=
     写入内容 = ""
     book.spine = ["nav", ]
     IDS = -1
+    文件序号 = -1
     for 卷名 in content:
         console.print("卷: " + 卷名)
         卷名标题 = "<h1>" + 卷名 + "</h1>"
@@ -159,8 +160,9 @@ def 写到书本(title, author, content, cover_name, cover_file, imgDir, folder=
         IDS += 1
         for 章节 in content[卷名]:
             console.print("章节: " + 章节[0])
+            文件序号 += 1
             单页 = epub.EpubHtml(title = 章节[0],
-                       file_name = 章节[0] + ".xhtml",
+                       file_name = f"{文件序号}_{章节[0]}.xhtml",
                        lang = "zh")
             章节名 = "<h2>" + 章节[0] + "</h2>"
             写入内容 = 写入内容 + 章节名 + str(章节[1]).replace("<div class=\"acontent\" id=\"acontent\">", "")
@@ -292,7 +294,7 @@ def 主要():
         pickle.dump([书名, 作者, 封面URL], f)
         
     if 下载图片:
-        下载图片集合(图片URL集合, 16)
+        下载图片集合(图片URL集合, 4)
         
     下载文件(封面URL)
     写到书本(书名, 作者, 内容, "cover", "file/"+封面URL.split("/")[-1], "file")
@@ -300,8 +302,9 @@ def 主要():
     os.remove("content.pickle")
     os.remove("images.pickle")
     os.remove("info.pickle")
+    os._exit()
     
-            
+
 if __name__ == "__main__":
     contentFile = Path("content.pickle")
     imagesFile = Path("images.pickle")
@@ -322,7 +325,7 @@ if __name__ == "__main__":
         主要()
     
     #console.print(图片URL集合)
-    下载图片集合(图片URL集合, 16)
+    下载图片集合(图片URL集合, 4)
     下载文件(封面URL)
     写到书本(书名, 作者, 内容, "cover", "file/"+封面URL.split("/")[-1], "file")
     shutil.rmtree('file')
