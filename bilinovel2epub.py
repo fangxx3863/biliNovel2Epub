@@ -30,12 +30,9 @@ HEARDERS = {
     "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36",
 }
 
-
-
 def 标准化JSON(s:str)->dict:
     obj = eval(s, type('js', (dict,), dict(__getitem__=lambda s, n: n))())
     return obj
-
 
 # 下载函数
 def 下载文件(url, path='file'):
@@ -59,28 +56,14 @@ def 下载图片集合(urls, jobs):
     errUrls = sorted(list(filter(None, errUrls)))
     while errUrls:
         errUrls = 下载文件(errUrls)
-    #print(errUrls)
 
-def 写到书本(title, author, content, cover_name, cover_file, imgDir, folder=None):
-    """写入内容至epub
-
-    传入基本参数，并将其写出至epub
-
-    Args:
-        title (str): 书籍名称
-        author (str): 作者名称
-        content (str): 文章html内容
-        cover_name (str): 封面名称
-        cover_file (str): 封面路径
-        imgDir (str): 引用图片路径
-    """    
+def 写到书本(title, author, content, cover_name, cover_file, imgDir, folder=None):   
     book.set_identifier(str(uuid.uuid4()))
     book.set_title(title)
     book.set_language('zh')
     book.add_author(author)
     cover_type = cover_file.split('.')[-1]
     book.set_cover(cover_name + '.' + cover_type, open(cover_file, 'rb').read())
-    
     写入内容 = ""
     book.spine = ["nav", ]
     IDS = -1
@@ -89,7 +72,6 @@ def 写到书本(title, author, content, cover_name, cover_file, imgDir, folder=
         写入内容 = 写入内容 + 卷名标题
         book.toc.append([epub.Section(卷名), []])
         IDS += 1
-        #print(写入内容)
         for 章节 in content[卷名]:
             单页 = epub.EpubHtml(title = 章节[0],
                        file_name = 章节[0] + ".xhtml",
@@ -109,7 +91,6 @@ def 写到书本(title, author, content, cover_name, cover_file, imgDir, folder=
     imgDirList = os.listdir(imgDir)
     for filename in imgDirList:
         filetype = filename.split('.')[-1]
-
         # 加载图片文件
         img = Image.open(imgDir + '/' + filename)  # 'image1.jpeg' should locate in current directory for this example
         b = io.BytesIO()
@@ -137,10 +118,8 @@ def 写到书本(title, author, content, cover_name, cover_file, imgDir, folder=
 
     epub.write_epub(folder + title + '.epub', book)
 
-
 if __name__ == "__main__":
     书籍ID = str(sys.argv[1]).split("/")[-1].split(".")[0]
-    #console.print(书籍ID)
 
     # 获得书籍名称
     书籍首页URL = 基础URL + f"/novel/{书籍ID}.html"
@@ -160,7 +139,6 @@ if __name__ == "__main__":
     目录集合 = 远程目录.find_all("li")
     缓存 = 目录集合[0].text
     子章节 = []
-    #console.print(缓存)
 
     for 单个目录 in 目录集合:
         文本 = 单个目录.text
@@ -172,18 +150,15 @@ if __name__ == "__main__":
             url = urljoin(基础URL,单个目录.find("a")["href"])
             子章节.append([文本,url])
     目录[缓存] = 子章节
-    #console.print(目录)
     
     for 卷名 in 目录:
         for 章节 in 目录[卷名]:
-            #console.print(章节)
             章节标题 = 章节[0]
             章节URL = 章节[1]
 
             # 处理目录中的错误链接
             if 章节[1] == "javascript:cid(0)":
                 章节[1] = 下一个URL
-                #console.print(目录)
             else:
                 下一个URL = 章节[1]
                 
@@ -208,25 +183,18 @@ if __name__ == "__main__":
             内容.setdefault(卷名, []).append([章节[0]])
             IDS += 1
             console.print("章节: " + 章节[0])
-            #console.print(内容)
             缓存内容 = ""
             for 单章URL in 章节[1:]:
                 soup = BeautifulSoup(session.get(单章URL,headers=HEARDERS).text, "lxml")
                 图片集合 = soup.find_all("img")
-                #console.print(图片集合)
                 文章内容 = str(soup.find(id="acontent"))
                 for 原始 in 图片集合:
                     图片URL集合.append(str(原始).split("src=\"")[-1][:-3])
                     替换 = "file/" + str(原始).split("src=\"")[-1][:-3].split("/")[-1]
-                    #console.print(替换)
                     文章内容 = 文章内容.replace(str(原始).split("src=\"")[-1][:-3], str(替换))
                 缓存内容 = 缓存内容 + 文章内容
-                #console.print(内容)
                 console.print(f"正在处理: {单章URL}")
             内容[卷名][IDS].append(缓存内容)
-
-    #console.print(图片URL集合)
-    #print(内容)
 
     下载图片集合(图片URL集合, 16)
     下载文件(封面URL)
