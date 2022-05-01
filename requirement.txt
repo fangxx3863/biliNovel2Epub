@@ -1,9 +1,7 @@
 rich
 bs4
-urllib
+pyOpenSSL
 ebooklib
 uuid
 download
-ssl
-PIL
-io
+Pillow
