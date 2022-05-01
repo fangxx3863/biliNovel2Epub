@@ -185,6 +185,11 @@ def 写到书本(title, author, content, cover_name, cover_file, imgDir, folder=
 
 if __name__ == "__main__":
     书籍ID = str(sys.argv[1]).split("/")[-1].split(".")[0]
+    
+    if Confirm.ask("是否下载图片? 下载图片[Y]不下载[N] "):
+        下载图片 = True
+    else:
+        下载图片 = False
 
     # 获得书籍名称
     书籍首页URL = 基础URL + f"/novel/{书籍ID}.html"
@@ -259,9 +264,8 @@ if __name__ == "__main__":
                 缓存内容 = 缓存内容 + 文章内容
                 console.print(f"正在处理: {单章URL}")
             内容[卷名][IDS].append(缓存内容)
-            
-    if Confirm.ask("是否下载图片? 下载图片[Y]不下载[N] "):
-        console.print(图片URL集合)
+    
+    if 下载图片:
         下载图片集合(图片URL集合, 8)
         
     下载文件(封面URL)
