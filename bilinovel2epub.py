@@ -127,11 +127,11 @@ if __name__ == "__main__":
     书名 = soup.find("h2",{"class":"book-title"}).text
     作者 = soup.find("div",{"class":"book-rand-a"}).text[:-2]
     简介 = soup.find(id = "bookSummary").text
+    封面URL = str(soup.find("img")).split("src=\"")[-1][:-3]
     console.print(简介)
 
     # 解析书籍目录部分,获取URL
     目录 = dict()
-    封面URL = 基础URL + f"/files/article/image/2/{书籍ID}/{书籍ID}s.jpg"
     目录URL = 基础URL + f"/novel/{书籍ID}/catalog"
     soup = BeautifulSoup(session.get(目录URL,headers=HEARDERS).text, "lxml")
     章节数 = soup.find("h4",{"class": "chapter-sub-title"}).find("output").text
