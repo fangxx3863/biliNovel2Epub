@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 import requests
+import pickle
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 import os
 import sys
 import shutil
+from pathlib import Path
 from rich.console import Console
 from rich.prompt import IntPrompt
 from rich.prompt import Prompt
@@ -100,24 +102,43 @@ def 标准化JSON(s:str)->dict:
 # 下载函数
 def 下载文件(url, path='file'):
     if isinstance(url, str):
-        try:
-            download(url, os.getcwd() + '/' + str(path) + '/' + os.path.basename(url), replace=False, verbose=False, timeout=5)
-        except:
-            return url
+        urlFile = Path(url.split("src=\"")[-1][:-3].split("/")[-1])
+        if urlFile.exists():
+            pass
+        else:
+            if " " in url:
+                pass
+            else:
+                try:
+                    download(url, os.getcwd() + '/' + str(path) + '/' + os.path.basename(url), replace=False, verbose=False, timeout=5)
+                except:
+                    return url
     if isinstance(url, list):
         errUrls = []
         for i in url:
-            try:
-                download(i, os.getcwd() + '/' + str(path) + '/' + os.path.basename(i), replace=False, verbose=False, timeout=5)
-            except:
-                errUrls.append(i)
-                return errUrls
+            urlFile = Path(i.split("src=\"")[-1][:-3].split("/")[-1])
+            if urlFile.exists():
+                pass
+            else:
+                if " " in i:
+                    pass
+                else:
+                    try:
+                        download(i, os.getcwd() + '/' + str(path) + '/' + os.path.basename(i), replace=False, verbose=False, timeout=5)
+                    except:
+                        errUrls.append(i)
+                        return errUrls
 
 def 下载图片集合(urls, jobs):
     pool = Pool(int(jobs))
     errUrls = pool.map(下载文件, urls)
     errUrls = sorted(list(filter(None, errUrls)))
     while errUrls:
+        for i in errUrls:
+            try:
+                os.remove(str(i).split("src=\"")[-1][:-3].split("/")[-1] + ".part")
+            except:
+                continue
         errUrls = 下载文件(errUrls)
 
 def 写到书本(title, author, content, cover_name, cover_file, imgDir, folder=None):   
@@ -183,14 +204,12 @@ def 写到书本(title, author, content, cover_name, cover_file, imgDir, folder=
 
     epub.write_epub(folder + title + '.epub', book)
 
-if __name__ == "__main__":
+def 主要():
     书籍ID = str(sys.argv[1]).split("/")[-1].split(".")[0]
-    
-    if Confirm.ask("是否下载图片? 下载图片[Y]不下载[N] "):
+    if Confirm.ask("是否下载图片? 下载图片[Y] 不下载[N] "):
         下载图片 = True
     else:
         下载图片 = False
-
     # 获得书籍名称
     书籍首页URL = 基础URL + f"/novel/{书籍ID}.html"
     soup = BeautifulSoup(session.get(书籍首页URL,headers=HEARDERS).text, "lxml")
@@ -264,10 +283,49 @@ if __name__ == "__main__":
                 缓存内容 = 缓存内容 + 文章内容
                 console.print(f"正在处理: {单章URL}")
             内容[卷名][IDS].append(缓存内容)
-    
+            
+    with open('content.pickle', 'wb') as f:
+        pickle.dump(内容, f)
+    with open('images.pickle', 'wb') as f:
+        pickle.dump(图片URL集合, f)      
+    with open('info.pickle', 'wb') as f:
+        pickle.dump([书名, 作者, 封面URL], f)
+        
     if 下载图片:
-        下载图片集合(图片URL集合, 8)
+        下载图片集合(图片URL集合, 16)
         
     下载文件(封面URL)
     写到书本(书名, 作者, 内容, "cover", "file/"+封面URL.split("/")[-1], "file")
     shutil.rmtree('file')
+    os.remove("content.pickle")
+    os.remove("images.pickle")
+    os.remove("info.pickle")
+    
+            
+if __name__ == "__main__":
+    contentFile = Path("content.pickle")
+    imagesFile = Path("images.pickle")
+    if contentFile.exists() or imagesFile.exists():
+        if Confirm.ask("检测到上次失败数据,是否继续上次操作? 是[Y] 否[N] "):
+            with open('content.pickle', 'rb') as f:
+                内容 = pickle.load(f)
+            with open('images.pickle', 'rb') as f:
+                图片URL集合 = pickle.load(f)
+            with open('info.pickle', 'rb') as f:
+                书名, 作者, 封面URL = pickle.load(f)
+        else:
+            os.remove("content.pickle")
+            os.remove("images.pickle")
+            os.remove("info.pickle")
+            主要()
+    else:
+        主要()
+    
+    #console.print(图片URL集合)
+    下载图片集合(图片URL集合, 16)
+    下载文件(封面URL)
+    写到书本(书名, 作者, 内容, "cover", "file/"+封面URL.split("/")[-1], "file")
+    shutil.rmtree('file')
+    os.remove("content.pickle")
+    os.remove("images.pickle")
+    os.remove("info.pickle")
