@@ -102,7 +102,7 @@ def 标准化JSON(s:str)->dict:
 # 下载函数
 def 下载文件(url, path='file'):
     if isinstance(url, str):
-        urlFile = Path(url.split("src=\"")[-1][:-3].split("/")[-1])
+        urlFile = Path(url.split("/")[-1])
         if urlFile.exists():
             pass
         else:
@@ -116,7 +116,7 @@ def 下载文件(url, path='file'):
     if isinstance(url, list):
         errUrls = []
         for i in url:
-            urlFile = Path(i.split("src=\"")[-1][:-3].split("/")[-1])
+            urlFile = Path(i.split("/")[-1])
             if urlFile.exists():
                 pass
             else:
