@@ -20,6 +20,7 @@ from PIL import Image
 import io
 from random import randint
 from multiprocessing import Pool, set_start_method
+import multiprocessing
 set_start_method('spawn', force=True)
 
 console = Console()
@@ -207,7 +208,14 @@ def 写到书本(title, author, content, cover_name, cover_file, imgDir, folder=
     epub.write_epub(folder + title + '.epub', book)
 
 def 主要():
-    书籍ID = str(sys.argv[1]).split("/")[-1].split(".")[0]
+    if len(sys.argv) == 1:
+        if Confirm.ask("您未输入任何参数,请选择一个操作 进入交互模式[Y] 查看命令帮助[N] "):
+            书籍ID = str(Prompt.ask("请输入书籍简介页面网址或直接输入书籍ID ")).split("/")[-1].split(".")[0]
+        else:
+            console.print("\n1. 请于命令行中进入到本项目路径\n2. 执行 python3 bilinovel2epub.py BookID \n3. BookID替换为书籍ID或书籍首页链接")
+            os._exit(0)
+    else:
+        书籍ID = str(sys.argv[1]).split("/")[-1].split(".")[0]
     if Confirm.ask("是否下载图片? 下载图片[Y] 不下载[N] "):
         下载图片 = True
     else:
@@ -215,10 +223,15 @@ def 主要():
     # 获得书籍名称
     书籍首页URL = 基础URL + f"/novel/{书籍ID}.html"
     soup = BeautifulSoup(session.get(书籍首页URL,headers=HEARDERS).text, "lxml")
-    书名 = soup.find("h2",{"class":"book-title"}).text
-    作者 = soup.find("div",{"class":"book-rand-a"}).text[:-2]
-    简介 = soup.find(id = "bookSummary").text
-    封面URL = str(soup.find("img")).split("src=\"")[-1][:-3]
+    try:
+        书名 = soup.find("h2",{"class":"book-title"}).text
+        作者 = soup.find("div",{"class":"book-rand-a"}).text[:-2]
+        简介 = soup.find(id = "bookSummary").text
+        封面URL = str(soup.find("img")).split("src=\"")[-1][:-3]
+    except:
+        console.print("您可能输入了错误的URL或ID!", style="rgb(230,58,58)")
+        os._exit(0)
+    
     console.print(简介)
 
     # 解析书籍目录部分,获取URL
@@ -246,12 +259,12 @@ def 主要():
     图片URL集合 = []
     IDS = -1
     for 卷名 in 目录:
-        console.print("卷: " + 卷名)
+        console.print("卷: " + 卷名, style="rgb(50,205,50)")
         IDS = -1
         for 章节 in 目录[卷名]:
             内容.setdefault(卷名, []).append([章节[0]])
             IDS += 1
-            console.print("章节: " + 章节[0])
+            console.print("章节: " + 章节[0], style="rgb(238,154,0)")
             缓存内容 = ""
             章节标题 = 章节[0]
             章节URL = 章节[1]
@@ -292,7 +305,7 @@ def 主要():
         pickle.dump(图片URL集合, f)      
     with open('info.pickle', 'wb') as f:
         pickle.dump([书名, 作者, 封面URL], f)
-        
+    
     if 下载图片:
         下载图片集合(图片URL集合, 4)
         
@@ -302,10 +315,11 @@ def 主要():
     os.remove("content.pickle")
     os.remove("images.pickle")
     os.remove("info.pickle")
-    os._exit()
+    os._exit(0)
     
 
 if __name__ == "__main__":
+    multiprocessing.freeze_support()
     contentFile = Path("content.pickle")
     imagesFile = Path("images.pickle")
     if contentFile.exists() or imagesFile.exists():
