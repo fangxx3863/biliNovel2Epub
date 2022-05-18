@@ -171,7 +171,9 @@ def 写到书本(title, author, content, cover_name, cover_file, imgDir, folder=
     
     imgDirList = os.listdir(imgDir)
     for filename in imgDirList:
-        if ".part" or ".DS_Store" in filename:
+        if ".part" in str(filename):
+            continue
+        if ".DS_Store" in str(filename):
             continue
         filetype = filename.split('.')[-1]
         # 加载图片文件
