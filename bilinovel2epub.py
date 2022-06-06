@@ -13,8 +13,6 @@ from rich.prompt import Prompt
 from rich.prompt import Confirm
 from ebooklib import epub
 import uuid
-import download
-from download import download
 import ssl
 from PIL import Image
 import io
@@ -91,38 +89,6 @@ HEARDERS = {
 def 标准化JSON(s:str)->dict:
     obj = eval(s, type('js', (dict,), dict(__getitem__=lambda s, n: n))())
     return obj
-
-'''
-# 下载函数(旧)
-def 下载文件(url, path='file'):
-    if isinstance(url, str):
-        urlFile = Path(path + "/" + url.split("/")[-1])
-        if urlFile.exists():
-            pass
-        else:
-            if " " in url:
-                pass
-            else:
-                try:
-                    download(url, os.getcwd() + '/' + str(path) + '/' + os.path.basename(url), replace=False, verbose=False, timeout=5)
-                except:
-                    return url
-    if isinstance(url, list):
-        errUrls = []
-        for i in url:
-            urlFile = Path(path + "/" + i.split("/")[-1])
-            if urlFile.exists():
-                pass
-            else:
-                if " " in i:
-                    pass
-                else:
-                    try:
-                        download(i, os.getcwd() + '/' + str(path) + '/' + os.path.basename(i), replace=False, verbose=False, timeout=5)
-                    except:
-                        errUrls.append(i)
-                        return errUrls
-'''
 
 # 下载函数
 def 下载文件(链接, 路径='file'):
