@@ -92,7 +92,8 @@ def 标准化JSON(s:str)->dict:
     obj = eval(s, type('js', (dict,), dict(__getitem__=lambda s, n: n))())
     return obj
 
-# 下载函数
+'''
+# 下载函数(旧)
 def 下载文件(url, path='file'):
     if isinstance(url, str):
         urlFile = Path(path + "/" + url.split("/")[-1])
@@ -121,37 +122,92 @@ def 下载文件(url, path='file'):
                     except:
                         errUrls.append(i)
                         return errUrls
+'''
+
+# 下载函数
+def 下载文件(链接, 路径='file'):
+    if isinstance(链接, str):
+        文件名 = 链接.split("/")[-1]
+        try:
+            请求 = requests.get(链接, headers=HEARDERS)
+            
+            # 检查文件完整性
+            expected_length = 请求.headers.get('Content-Length')
+            if expected_length is not None:
+                actual_length = 请求.raw.tell()
+                expected_length = int(expected_length)
+                if actual_length < expected_length:
+                    raise IOError(
+                        'incomplete read ({} bytes read, {} more expected)'.format(
+                            actual_length,
+                            expected_length - actual_length
+                        )
+                    )
+            
+        except:
+            try:
+                os.remove(f"{路径}/{文件名}")
+            except:
+                pass
+            return 链接
+        console.print(f"正在下载文件: [dark_slate_gray2]{文件名}[/dark_slate_gray2]")
+        with open(f"{路径}/{文件名}", "wb") as f:
+            f.write(请求.content)
+    if isinstance(链接, list):
+        错误链接 = []
+        文件名 = 链接.split("/")[-1]
+        for i in 链接:
+            try:
+                请求 = requests.get(链接, headers=HEARDERS)
+                
+                # 检查文件完整性
+                expected_length = 请求.headers.get('Content-Length')
+                if expected_length is not None:
+                    actual_length = 请求.raw.tell()
+                    expected_length = int(expected_length)
+                    if actual_length < expected_length:
+                        raise IOError(
+                            'incomplete read ({} bytes read, {} more expected)'.format(
+                                actual_length,
+                                expected_length - actual_length
+                            )
+                        )
+            except:
+                try:
+                    os.remove(f"{路径}/{文件名}")
+                except:
+                    pass
+                错误链接.append(i)
+            console.print(f"正在下载文件: [dark_slate_gray2]{文件名}[/dark_slate_gray2]")
+            with open(f"{路径}/{文件名}", "wb") as f:
+                f.write(请求.content)
+        return 错误链接
 
 def 下载图片集合(urls, jobs):
-    pool = Pool(int(jobs))
-    errUrls = pool.map(下载文件, urls)
-    errUrls = sorted(list(filter(None, errUrls)))
-    while errUrls:
-        for i in errUrls:
-            try:
-                os.remove("file/" + str(i).split("src=\"")[-1][:-3].split("/")[-1] + ".part")
-            except:
-                continue
-        errUrls = 下载文件(errUrls)
+    进程池 = Pool(int(jobs))
+    错误链接 = 进程池.map(下载文件, urls)
+    错误链接 = sorted(list(filter(None, 错误链接)))
+    while 错误链接:
+        错误链接 = 下载文件(错误链接)
 
-def 写到书本(title, author, content, cover_name, cover_file, imgDir, folder=None):   
+def 写到书本(title, 作者, 内容, 封面文件名, 封面文件, 图片路径, folder=None):   
     book.set_identifier(str(uuid.uuid4()))
     book.set_title(title)
     book.set_language('zh')
-    book.add_author(author)
-    cover_type = cover_file.split('.')[-1]
-    book.set_cover(cover_name + '.' + cover_type, open(cover_file, 'rb').read())
+    book.add_author(作者)
+    cover_type = 封面文件.split('.')[-1]
+    book.set_cover(封面文件名 + '.' + cover_type, open(封面文件, 'rb').read())
     写入内容 = ""
     book.spine = ["nav", ]
     IDS = -1
     文件序号 = -1
-    for 卷名 in content:
+    for 卷名 in 内容:
         console.print("卷: " + 卷名)
         卷名标题 = "<h1>" + 卷名 + "</h1>"
         写入内容 = 写入内容 + 卷名标题
         book.toc.append([epub.Section(卷名), []])
         IDS += 1
-        for 章节 in content[卷名]:
+        for 章节 in 内容[卷名]:
             console.print("章节: " + 章节[0])
             文件序号 += 1
             单页 = epub.EpubHtml(title = 章节[0],
@@ -169,22 +225,23 @@ def 写到书本(title, author, content, cover_name, cover_file, imgDir, folder=
             book.spine.append(单页)
             写入内容 = ""
     
-    imgDirList = os.listdir(imgDir)
-    for filename in imgDirList:
-        if ".part" in str(filename):
+    图片路径集 = os.listdir(图片路径)
+    for 文件名 in 图片路径集:
+        if not (".jpg" or ".png" or ".webp" or ".jpeg" or ".bmp") in str(文件名):
             continue
-        if ".DS_Store" in str(filename):
-            continue
-        filetype = filename.split('.')[-1]
+        文件类型 = 文件名.split('.')[-1]
         # 加载图片文件
-        img = Image.open(imgDir + '/' + filename)  # 'image1.jpeg' should locate in current directory for this example
+        try:
+            img = Image.open(图片路径 + '/' + 文件名)
+        except:
+            continue
         b = io.BytesIO()
         img = img.convert('RGB')
         img.save(b, 'jpeg')
         data_img = b.getvalue()
 
-        filename = filename.replace('png', 'jpg')
-        img = epub.EpubItem(file_name="file/%s" % filename,
+        文件名 = 文件名.replace('png', 'jpg')
+        img = epub.EpubItem(file_name="file/%s" % 文件名,
                             media_type="image/jpeg", content=data_img)
         book.add_item(img)
 
@@ -212,7 +269,7 @@ def 主要():
             os._exit(0)
     else:
         书籍ID = str(sys.argv[1]).split("/")[-1].split(".")[0]
-    if Confirm.ask("是否下载图片? 下载图片[Y] 不下载[N] "):
+    if Confirm.ask("是否下载图片? 下载[Y] 不下载[N] "):
         下载图片 = True
     else:
         下载图片 = False
@@ -253,6 +310,7 @@ def 主要():
     
     内容 = dict()
     图片URL集合 = []
+    图片URL集合.append(封面URL)
     IDS = -1
     for 卷名 in 目录:
         console.print("卷: " + 卷名, style="rgb(50,205,50)")
@@ -303,9 +361,12 @@ def 主要():
         pickle.dump([书名, 作者, 封面URL], f)
     
     if 下载图片:
+        文件存在 = os.path.exists("file") #判断路径是否存在
+        if not 文件存在:
+            # 如果不存在则创建目录
+            os.makedirs("file")
         下载图片集合(图片URL集合, 4)
-        
-    下载文件(封面URL)
+    
     写到书本(书名, 作者, 内容, "cover", "file/"+封面URL.split("/")[-1], "file")
     shutil.rmtree('file')
     os.remove("content.pickle")
@@ -335,8 +396,11 @@ if __name__ == "__main__":
         主要()
     
     #console.print(图片URL集合)
+    文件存在 = os.path.exists("file") #判断路径是否存在
+    if not 文件存在:
+        # 如果不存在则创建目录
+        os.makedirs("file")
     下载图片集合(图片URL集合, 4)
-    下载文件(封面URL)
     写到书本(书名, 作者, 内容, "cover", "file/"+封面URL.split("/")[-1], "file")
     shutil.rmtree('file')
     os.remove("content.pickle")
