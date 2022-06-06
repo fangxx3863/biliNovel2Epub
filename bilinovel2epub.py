@@ -93,10 +93,9 @@ def 标准化JSON(s:str)->dict:
 # 下载函数
 def 下载文件(链接, 路径='file'):
     if isinstance(链接, str):
-        文件名 = 链接.split("/")[-1]
         try:
             请求 = requests.get(链接, headers=HEARDERS)
-            
+            文件名 = 链接.split("/")[-1]
             # 检查文件完整性
             expected_length = 请求.headers.get('Content-Length')
             if expected_length is not None:
@@ -116,15 +115,15 @@ def 下载文件(链接, 路径='file'):
             except:
                 pass
             return 链接
-        console.print(f"正在下载文件: [dark_slate_gray2]{文件名}[/dark_slate_gray2]")
+        console.print(f"正在下载: [dark_slate_gray2]{链接}[/dark_slate_gray2]")
         with open(f"{路径}/{文件名}", "wb") as f:
             f.write(请求.content)
     if isinstance(链接, list):
         错误链接 = []
-        文件名 = 链接.split("/")[-1]
         for i in 链接:
             try:
                 请求 = requests.get(链接, headers=HEARDERS)
+                文件名 = 链接.split("/")[-1]
                 
                 # 检查文件完整性
                 expected_length = 请求.headers.get('Content-Length')
@@ -144,7 +143,7 @@ def 下载文件(链接, 路径='file'):
                 except:
                     pass
                 错误链接.append(i)
-            console.print(f"正在下载文件: [dark_slate_gray2]{文件名}[/dark_slate_gray2]")
+            console.print(f"正在下载: [dark_slate_gray2]{链接}[/dark_slate_gray2]")
             with open(f"{路径}/{文件名}", "wb") as f:
                 f.write(请求.content)
         return 错误链接
