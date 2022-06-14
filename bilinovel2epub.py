@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import time
 import requests
 import pickle
 from bs4 import BeautifulSoup
@@ -93,9 +94,19 @@ def 标准化JSON(s:str)->dict:
 # 下载函数
 def 下载文件(链接, 路径='file'):
     if isinstance(链接, str):
+        if "http" not in 链接:
+            return
+        if " " in 链接:
+            return
+        try:
+            文件名 = 链接.split("/")[-1]
+        except:
+            return
+        文件存在 = Path(f"{路径}/{文件名}")
+        if 文件存在.exists():
+            return
         try:
             请求 = requests.get(链接, headers=HEARDERS)
-            文件名 = 链接.split("/")[-1]
             # 检查文件完整性
             expected_length = 请求.headers.get('Content-Length')
             if expected_length is not None:
@@ -121,9 +132,19 @@ def 下载文件(链接, 路径='file'):
     if isinstance(链接, list):
         错误链接 = []
         for i in 链接:
+            if "http" not in 链接:
+                continue
+            if " " in 链接:
+                return
+            try:                            
+                文件名 = 链接.split("/")[-1] 
+            except:
+                return
+            文件存在 = Path(f"{路径}/{文件名}")
+            if 文件存在.exists():   
+                return
             try:
                 请求 = requests.get(链接, headers=HEARDERS)
-                文件名 = 链接.split("/")[-1]
                 
                 # 检查文件完整性
                 expected_length = 请求.headers.get('Content-Length')
@@ -295,7 +316,17 @@ def 主要():
                 下一个URL = 章节[1]
                 
             while True:
-                soup = BeautifulSoup(session.get(下一个URL,headers=HEARDERS).text, "lxml")
+                for i in range(6):
+                    if i >= 5:
+                        console.print("[red]错误次数过多!已终止运行!")
+                        os._exit(0)
+                    try:
+                        soup = BeautifulSoup(session.get(下一个URL,headers=HEARDERS,timeout=5).text, "lxml")
+                    except:
+                        console.print(f"第{i + 1}次请求失败,正在重试...")
+                        time.sleep(3)
+                    else:
+                        break
                 读取参数Script = soup.find("body",{"id":"aread"}).find("script")
                 读取参数Script文本 = 读取参数Script.text
                 readParams = 标准化JSON(读取参数Script文本[len("var ReadParams="):])
@@ -307,7 +338,17 @@ def 主要():
                     break
             
             for 单章URL in 章节[1:]:
-                soup = BeautifulSoup(session.get(单章URL,headers=HEARDERS).text, "lxml")
+                for i in range(6):
+                    if i >= 5:
+                        console.print("[red]错误次数过多!已终止运行!")
+                        os._exit(0)
+                    try:
+                        soup = BeautifulSoup(session.get(单章URL,headers=HEARDERS,timeout=5).text, "lxml")
+                    except:
+                        console.print(f"第{i + 1}次请求失败,正在重试...")
+                        time.sleep(3)
+                    else:
+                        break
                 图片集合 = soup.find_all("img")
                 文章内容 = str(soup.find(id="acontent"))
                 for 原始 in 图片集合:
