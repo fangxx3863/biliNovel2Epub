@@ -197,7 +197,7 @@ def 写到书本(title, 作者, 内容, 封面文件名, 封面文件, 图片路
             console.print("章节: " + 章节[0])
             文件序号 += 1
             单页 = epub.EpubHtml(title = 章节[0],
-                       file_name = f"{文件序号}_{章节[0]}.xhtml",
+                       file_name = f"{文件序号}.xhtml",
                        lang = "zh")
             章节名 = "<h2>" + 章节[0] + "</h2>"
             写入内容 = 写入内容 + 章节名 + str(章节[1]).replace("<div class=\"acontent\" id=\"acontent\">", "")
