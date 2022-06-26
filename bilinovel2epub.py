@@ -26,58 +26,32 @@ console = Console()
 session = requests.Session()
 # 关闭SSL证书验证
 ssl._create_default_https_context = ssl._create_unverified_context
-# 初始化epub工具
-book = epub.EpubBook()
+
 
 基础URL = "https://w.linovelib.com"
 
  
-USER_AGENTS =    ["Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:88.0) Gecko/20100101 Firefox/88.0",
-                  "Mozilla/5.0 (Linux; U; Android 4.0.2; en-us; Galaxy Nexus Build/ICL53F) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
+USER_AGENTS =    ["Mozilla/5.0 (Linux; U; Android 4.0.2; en-us; Galaxy Nexus Build/ICL53F) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30",
                   "Mozilla/5.0 (Linux; U; Android 2.3.6; en-us; Nexus S Build/GRK39F) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1",
-                  "Mozilla/5.0 (BB10; Touch) AppleWebKit/537.1+ (KHTML, like Gecko) Version/10.0.0.1337 Mobile Safari/537.1+",
-                  "Mozilla/5.0 (PlayBook; U; RIM Tablet OS 2.1.0; en-US) AppleWebKit/536.2+ (KHTML, like Gecko) Version/7.2.1.0 Safari/536.2+",
-                  "Mozilla/5.0 (BlackBerry; U; BlackBerry 9900; en-US) AppleWebKit/534.11+ (KHTML, like Gecko) Version/7.0.0.187 Mobile Safari/534.11+",
                   "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Mobile Safari/537.36",
                   "Mozilla/5.0 (Linux; Android 10; Pixel 4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Mobile Safari/537.36",
                   "Mozilla/5.0 (Linux; Android 4.3; Nexus 7 Build/JSS15Q) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
                   "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/91.0.4472.124 Mobile/15E148 Safari/604.1",
                   "Mozilla/5.0 (iPad; CPU OS 13_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/91.0.4472.124 Mobile/15E148 Safari/604.1",
-                  "Mozilla/5.0 (X11; CrOS x86_64 10066.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-                  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-                  "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
                   "Mozilla/5.0 (Android 4.4; Mobile; rv:70.0) Gecko/70.0 Firefox/70.0",
                   "Mozilla/5.0 (iPhone; CPU iPhone OS 8_3 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) FxiOS/1.0 Mobile/12F69 Safari/600.1.4",
                   "Mozilla/5.0 (iPad; CPU iPhone OS 8_3 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) FxiOS/1.0 Mobile/12F69 Safari/600.1.4",
-                  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:70.0) Gecko/20100101 Firefox/70.0",
-                  "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:70.0) Gecko/20100101 Firefox/70.0",
-                  "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
-                  "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Googlebot/2.1; +http://www.google.com/bot.html) Chrome/91.0.4472.124 Safari/537.36",
                   "Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
-                  "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko",
-                  "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)",
-                  "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0)",
-                  "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0)",
-                  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.100.0",
-                  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/604.1 Edg/91.0.100.0",
                   "Mozilla/5.0 (iPhone; CPU iPhone OS 12_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.1.1 EdgiOS/44.5.0.10 Mobile/15E148 Safari/604.1",
                   "Mozilla/5.0 (iPad; CPU OS 12_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 EdgiOS/44.5.2 Mobile/15E148 Safari/605.1.15",
                   "Mozilla/5.0 (Linux; Android 8.1.0; Pixel Build/OPM4.171019.021.D1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.109 Mobile Safari/537.36 EdgA/42.0.0.2057",
                   "Mozilla/5.0 (Linux; Android 6.0.1; Nexus 7 Build/MOB30X) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.109 Safari/537.36 EdgA/42.0.0.2057",
-                  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.19042",
-                  "Mozilla/5.0 (Windows NT 10.0; Win64; x64; Xbox; Xbox One) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.19041",
-                  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36 OPR/65.0.3467.48",
-                  "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36 OPR/65.0.3467.48",
-                  "Opera/9.80 (Macintosh; Intel Mac OS X 10.9.1) Presto/2.12.388 Version/12.16",
-                  "Opera/9.80 (Windows NT 6.1) Presto/2.12.388 Version/12.16",
                   "Opera/12.02 (Android 4.1; Linux; Opera Mobi/ADR-1111101157; U; en-US) Presto/2.9.201 Version/12.02",
                   "Opera/9.80 (iPhone; Opera Mini/8.0.0/34.2336; U; en) Presto/2.8.119 Version/11.10",
                   "Mozilla/5.0 (iPad; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1",
                   "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1",
-                  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Safari/605.1.15",
                   "Mozilla/5.0 (Linux; U; Android 8.1.0; en-US; Nexus 6P Build/OPM7.181205.001) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/57.0.2987.108 UCBrowser/12.11.1.1197 Mobile Safari/537.36",
                   "Mozilla/5.0 (iPhone; CPU iPhone OS 12_1 like Mac OS X; zh-CN) AppleWebKit/537.51.1 (KHTML, like Gecko) Mobile/16B92 UCBrowser/12.1.7.1109 Mobile AliApp(TUnionSDK/0.1.20.3)",
-                  "Mozilla/5.0 (compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch; NOKIA; Lumia 920) UCBrowser/10.1.0.563 Mobile"
                  ]
  
 random_agent = USER_AGENTS[randint(0, len(USER_AGENTS)-1)]
@@ -176,7 +150,9 @@ def 下载图片集合(urls, jobs):
     while 错误链接:
         错误链接 = 下载文件(错误链接)
 
-def 写到书本(title, 作者, 内容, 封面文件名, 封面文件, 图片路径, folder=None):   
+def 写到书本(title, 作者, 内容, 封面文件名, 封面文件, 图片路径, folder=None, 分卷输出=False):
+    # 初始化epub工具
+    book = epub.EpubBook()
     book.set_identifier(str(uuid.uuid4()))
     book.set_title(title)
     book.set_language('zh')
@@ -187,18 +163,43 @@ def 写到书本(title, 作者, 内容, 封面文件名, 封面文件, 图片路
     book.spine = ["nav", ]
     IDS = -1
     文件序号 = -1
-    for 卷名 in 内容:
-        console.print("卷: " + 卷名)
-        卷名标题 = "<h1>" + 卷名 + "</h1>"
+    
+    if not 分卷输出:
+        for 卷名 in 内容:
+            console.print("卷: " + 卷名)
+            卷名标题 = "<h1>" + 卷名 + "</h1>"
+            写入内容 = 写入内容 + 卷名标题
+            book.toc.append([epub.Section(卷名), []])
+            IDS += 1
+            for 章节 in 内容[卷名]:
+                console.print("章节: " + 章节[0])
+                文件序号 += 1
+                单页 = epub.EpubHtml(title = 章节[0],
+                        file_name = f"{文件序号}.xhtml",
+                        lang = "zh")
+                章节名 = "<h2>" + 章节[0] + "</h2>"
+                写入内容 = 写入内容 + 章节名 + str(章节[1]).replace("<div class=\"acontent\" id=\"acontent\">", "")
+                写入内容 = 写入内容.replace('png', 'jpg')
+                # 添加CSS规则
+                css = '<style>p{text-indent:2em; padding:0px; margin:0px;}</style>'
+                写入内容 = 写入内容 + css
+                单页.set_content(写入内容)
+                book.add_item(单页)
+                book.toc[IDS][1].append(单页)
+                book.spine.append(单页)
+                写入内容 = ""
+    else:
+        console.print("卷: " + title)
+        卷名标题 = "<h1>" + title + "</h1>"
         写入内容 = 写入内容 + 卷名标题
-        book.toc.append([epub.Section(卷名), []])
+        book.toc.append([epub.Section(title), []])
         IDS += 1
-        for 章节 in 内容[卷名]:
+        for 章节 in 内容:
             console.print("章节: " + 章节[0])
             文件序号 += 1
             单页 = epub.EpubHtml(title = 章节[0],
-                       file_name = f"{文件序号}.xhtml",
-                       lang = "zh")
+                    file_name = f"{文件序号}.xhtml",
+                    lang = "zh")
             章节名 = "<h2>" + 章节[0] + "</h2>"
             写入内容 = 写入内容 + 章节名 + str(章节[1]).replace("<div class=\"acontent\" id=\"acontent\">", "")
             写入内容 = 写入内容.replace('png', 'jpg')
@@ -247,6 +248,7 @@ def 写到书本(title, 作者, 内容, 封面文件名, 封面文件, 图片路
     epub.write_epub(folder + title + '.epub', book)
 
 def 主要():
+    分卷输出 = False
     if len(sys.argv) == 1:
         if Confirm.ask("您未输入任何参数,请选择一个操作 进入交互模式[Y] 查看命令帮助[N] "):
             书籍ID = str(Prompt.ask("请输入书籍简介页面网址或直接输入书籍ID ")).split("/")[-1].split(".")[0]
@@ -255,6 +257,11 @@ def 主要():
             os._exit(0)
     else:
         书籍ID = str(sys.argv[1]).split("/")[-1].split(".")[0]
+    
+    if Confirm.ask("是否分卷输出文件? 分卷[Y] 单文件[N] "):
+        分卷输出 = True
+    else:
+        分卷输出 = False
     if Confirm.ask("是否下载图片? 下载[Y] 不下载[N] "):
         下载图片 = True
     else:
@@ -295,11 +302,12 @@ def 主要():
     目录[缓存] = 子章节
     
     内容 = dict()
-    图片URL集合 = []
-    图片URL集合.append(封面URL)
+    图片URL集合 = dict()
+    # 图片URL集合.append(封面URL)
     IDS = -1
     for 卷名 in 目录:
         console.print("卷: " + 卷名, style="rgb(50,205,50)")
+        图片URL集合.setdefault(卷名, []).append(封面URL)
         IDS = -1
         for 章节 in 目录[卷名]:
             内容.setdefault(卷名, []).append([章节[0]])
@@ -352,7 +360,7 @@ def 主要():
                 图片集合 = soup.find_all("img")
                 文章内容 = str(soup.find(id="acontent"))
                 for 原始 in 图片集合:
-                    图片URL集合.append(str(原始).split("src=\"")[-1][:-3])
+                    图片URL集合[卷名].append(str(原始).split("src=\"")[-1][:-3])
                     替换 = "file/" + str(原始).split("src=\"")[-1][:-3].split("/")[-1]
                     文章内容 = 文章内容.replace(str(原始).split("src=\"")[-1][:-3], str(替换))
                 缓存内容 = 缓存内容 + 文章内容
@@ -364,17 +372,41 @@ def 主要():
     with open('images.pickle', 'wb') as f:
         pickle.dump(图片URL集合, f)      
     with open('info.pickle', 'wb') as f:
-        pickle.dump([书名, 作者, 封面URL], f)
+        pickle.dump([书名, 作者, 封面URL, 分卷输出, 下载图片], f)
     
-    if 下载图片:
+    if 下载图片 and (not 分卷输出):
         文件存在 = os.path.exists("file") #判断路径是否存在
         if not 文件存在:
             # 如果不存在则创建目录
             os.makedirs("file")
-        下载图片集合(图片URL集合, 4)
+        图片URL列表 = []
+        for i in 图片URL集合:
+            for j in range(0, len(图片URL集合[i])):
+                图片URL列表.append(图片URL集合[i][j])
+        下载图片集合(图片URL列表, 4)
     
-    写到书本(书名, 作者, 内容, "cover", "file/"+封面URL.split("/")[-1], "file")
-    shutil.rmtree('file')
+    if 下载图片 and 分卷输出:
+        try:
+            os.makedirs(书名)
+        except:
+            pass
+        for 卷名 in 内容:
+            文件存在 = os.path.exists("file") #判断路径是否存在
+            if not 文件存在:
+                # 如果不存在则创建目录
+                os.makedirs("file")
+            下载图片集合(图片URL集合[卷名], 4)
+            写到书本(书名+"_"+卷名, 作者, 内容[卷名], "cover", "file/"+封面URL.split("/")[-1], "file", 书名, True)
+            try:
+                shutil.rmtree('file')
+            except:
+                pass
+    else:
+        写到书本(书名, 作者, 内容, "cover", "file/"+封面URL.split("/")[-1], "file")
+    try:
+        shutil.rmtree('file')
+    except:
+        pass
     os.remove("content.pickle")
     os.remove("images.pickle")
     os.remove("info.pickle")
@@ -392,23 +424,53 @@ if __name__ == "__main__":
             with open('images.pickle', 'rb') as f:
                 图片URL集合 = pickle.load(f)
             with open('info.pickle', 'rb') as f:
-                书名, 作者, 封面URL = pickle.load(f)
+                书名, 作者, 封面URL, 分卷输出, 下载图片 = pickle.load(f)
         else:
             os.remove("content.pickle")
             os.remove("images.pickle")
             os.remove("info.pickle")
+            # 忽略上次失败数据
             主要()
     else:
+        # 没有上次失败数据
         主要()
+    
+    # 处理上次失败数据
     
     #console.print(图片URL集合)
     文件存在 = os.path.exists("file") #判断路径是否存在
     if not 文件存在:
         # 如果不存在则创建目录
         os.makedirs("file")
-    下载图片集合(图片URL集合, 4)
-    写到书本(书名, 作者, 内容, "cover", "file/"+封面URL.split("/")[-1], "file")
-    shutil.rmtree('file')
+    if 下载图片 and (not 分卷输出):
+        图片URL列表 = []
+        for i in 图片URL集合:
+            for j in range(0, len(图片URL集合[i])):
+                图片URL列表.append(图片URL集合[i][j])
+        下载图片集合(图片URL列表, 4)
+        
+    if 下载图片 and 分卷输出:
+        try:
+            os.makedirs(书名)
+        except:
+            pass
+        for 卷名 in 内容:
+            文件存在 = os.path.exists("file") #判断路径是否存在
+            if not 文件存在:
+                # 如果不存在则创建目录
+                os.makedirs("file")
+            下载图片集合(图片URL集合[卷名], 4)
+            写到书本(书名+"_"+卷名, 作者, 内容[卷名], "cover", "file/"+封面URL.split("/")[-1], "file", 书名, True)
+            try:
+                shutil.rmtree('file')
+            except:
+                pass
+    else:
+        写到书本(书名, 作者, 内容, "cover", "file/"+封面URL.split("/")[-1], "file")
+    try:
+        shutil.rmtree('file')
+    except:
+        pass
     os.remove("content.pickle")
     os.remove("images.pickle")
     os.remove("info.pickle")
