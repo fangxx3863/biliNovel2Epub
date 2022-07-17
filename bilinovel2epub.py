@@ -408,6 +408,11 @@ def 主要():
             except:
                 pass
     else:
+        文件存在 = os.path.exists("file") #判断路径是否存在
+        if not 文件存在:
+            # 如果不存在则创建目录
+            os.makedirs("file")
+        下载文件(封面URL)
         写到书本(书名, 作者, 内容, "cover", "file/" + "-".join(封面URL.split("/")[-4:]), "file")
     try:
         shutil.rmtree('file')
@@ -472,6 +477,11 @@ if __name__ == "__main__":
             except:
                 pass
     else:
+        文件存在 = os.path.exists("file") #判断路径是否存在
+        if not 文件存在:
+            # 如果不存在则创建目录
+            os.makedirs("file")
+        下载文件(封面URL)
         写到书本(书名, 作者, 内容, "cover", "file/" + "-".join(封面URL.split("/")[-4:]), "file")
     try:
         shutil.rmtree('file')
