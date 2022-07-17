@@ -17,6 +17,7 @@ import uuid
 import ssl
 from PIL import Image
 import io
+import re
 from random import randint
 from multiprocessing import Pool, set_start_method
 import multiprocessing
@@ -73,7 +74,8 @@ def 下载文件(链接, 路径='file'):
         if " " in 链接:
             return
         try:
-            文件名 = 链接.split("/")[-1]
+            文件名 = "-"
+            文件名 = 文件名.join(链接.split("/")[-4:])
         except:
             return
         文件存在 = Path(f"{路径}/{文件名}")
@@ -111,7 +113,8 @@ def 下载文件(链接, 路径='file'):
             if " " in 链接:
                 return
             try:                            
-                文件名 = 链接.split("/")[-1] 
+                文件名 = "-"
+                文件名 = 文件名.join(链接.split("/")[-4:])
             except:
                 return
             文件存在 = Path(f"{路径}/{文件名}")
@@ -361,8 +364,11 @@ def 主要():
                 文章内容 = str(soup.find(id="acontent"))
                 for 原始 in 图片集合:
                     图片URL集合[卷名].append(str(原始).split("src=\"")[-1][:-3])
-                    替换 = "file/" + str(原始).split("src=\"")[-1][:-3].split("/")[-1]
-                    文章内容 = 文章内容.replace(str(原始).split("src=\"")[-1][:-3], str(替换))
+                    # 替换 = "file/" + str(原始).split("src=\"")[-1][:-3].split("/")[-1]
+                    替换目标 = re.search(r"(?<=src=\").*?(?=\")", str(原始))
+                    替换 = "-"
+                    替换 = "file/" + 替换.join(替换目标.group().split("/")[-4:])
+                    文章内容 = 文章内容.replace(str(替换目标.group()), str(替换))
                 缓存内容 = 缓存内容 + 文章内容
                 console.print(f"正在处理: {单章URL}")
             内容[卷名][IDS].append(缓存内容)
@@ -396,13 +402,13 @@ def 主要():
                 # 如果不存在则创建目录
                 os.makedirs("file")
             下载图片集合(图片URL集合[卷名], 4)
-            写到书本(书名+"_"+卷名, 作者, 内容[卷名], "cover", "file/"+封面URL.split("/")[-1], "file", 书名, True)
+            写到书本(书名+"_"+卷名, 作者, 内容[卷名], "cover", "file/" + "-".join(封面URL.split("/")[-4:]), "file", 书名, True)
             try:
                 shutil.rmtree('file')
             except:
                 pass
     else:
-        写到书本(书名, 作者, 内容, "cover", "file/"+封面URL.split("/")[-1], "file")
+        写到书本(书名, 作者, 内容, "cover", "file/" + "-".join(封面URL.split("/")[-4:]), "file")
     try:
         shutil.rmtree('file')
     except:
@@ -460,13 +466,13 @@ if __name__ == "__main__":
                 # 如果不存在则创建目录
                 os.makedirs("file")
             下载图片集合(图片URL集合[卷名], 4)
-            写到书本(书名+"_"+卷名, 作者, 内容[卷名], "cover", "file/"+封面URL.split("/")[-1], "file", 书名, True)
+            写到书本(书名+"_"+卷名, 作者, 内容[卷名], "cover", "file/" + "-".join(封面URL.split("/")[-4:]), "file", 书名, True)
             try:
                 shutil.rmtree('file')
             except:
                 pass
     else:
-        写到书本(书名, 作者, 内容, "cover", "file/"+封面URL.split("/")[-1], "file")
+        写到书本(书名, 作者, 内容, "cover", "file/" + "-".join(封面URL.split("/")[-4:]), "file")
     try:
         shutil.rmtree('file')
     except:
