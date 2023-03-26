@@ -9,7 +9,6 @@ import sys
 import shutil
 from pathlib import Path
 from rich.console import Console
-from rich.prompt import IntPrompt
 from rich.prompt import Prompt
 from rich.prompt import Confirm
 from ebooklib import epub
@@ -66,6 +65,11 @@ def 标准化JSON(s:str)->dict:
     obj = eval(s, type('js', (dict,), dict(__getitem__=lambda s, n: n))())
     return obj
 
+def clean_file_name(filename:str):
+    invalid_chars='[\\\:*?"<>|]'
+    replace_char='-'
+    return re.sub(invalid_chars,replace_char,filename)
+
 # 下载函数
 def 下载文件(链接, 路径='file'):
     if isinstance(链接, str):
@@ -75,7 +79,7 @@ def 下载文件(链接, 路径='file'):
             return
         try:
             文件名 = "-"
-            文件名 = 文件名.join(链接.split("/")[-4:])
+            文件名 = 文件名.join(clean_file_name(链接).split("/")[-4:])
         except:
             return
         文件存在 = Path(f"{路径}/{文件名}")
@@ -402,7 +406,7 @@ def 主要():
                 # 如果不存在则创建目录
                 os.makedirs("file")
             下载图片集合(图片URL集合[卷名], 4)
-            写到书本(书名+"_"+卷名, 作者, 内容[卷名], "cover", "file/" + "-".join(封面URL.split("/")[-4:]), "file", 书名, True)
+            写到书本(书名+"_"+卷名, 作者, 内容[卷名], "-".join(clean_file_name(封面URL).split("/")[-4:]), "file/" + "-".join(clean_file_name(封面URL).split("/")[-4:]), "file", 书名, True)
             try:
                 shutil.rmtree('file')
             except:
@@ -413,7 +417,7 @@ def 主要():
             # 如果不存在则创建目录
             os.makedirs("file")
         下载文件(封面URL)
-        写到书本(书名, 作者, 内容, "cover", "file/" + "-".join(封面URL.split("/")[-4:]), "file")
+        写到书本(书名, 作者, 内容, "-".join(clean_file_name(封面URL).split("/")[-4:]), "file/" + "-".join(clean_file_name(封面URL).split("/")[-4:]), "file")
     try:
         shutil.rmtree('file')
     except:
@@ -471,7 +475,7 @@ if __name__ == "__main__":
                 # 如果不存在则创建目录
                 os.makedirs("file")
             下载图片集合(图片URL集合[卷名], 4)
-            写到书本(书名+"_"+卷名, 作者, 内容[卷名], "cover", "file/" + "-".join(封面URL.split("/")[-4:]), "file", 书名, True)
+            写到书本(书名+"_"+卷名, 作者, 内容[卷名], "-".join(clean_file_name(封面URL).split("/")[-4:]), "file/" + "-".join(clean_file_name(封面URL).split("/")[-4:]), "file", 书名, True)
             try:
                 shutil.rmtree('file')
             except:
@@ -482,7 +486,7 @@ if __name__ == "__main__":
             # 如果不存在则创建目录
             os.makedirs("file")
         下载文件(封面URL)
-        写到书本(书名, 作者, 内容, "cover", "file/" + "-".join(封面URL.split("/")[-4:]), "file")
+        写到书本(书名, 作者, 内容, "-".join(clean_file_name(封面URL).split("/")[-4:]), "file/" + "-".join(clean_file_name(封面URL).split("/")[-4:]), "file")
     try:
         shutil.rmtree('file')
     except:
