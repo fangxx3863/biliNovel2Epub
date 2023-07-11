@@ -4,3 +4,5 @@ pyOpenSSL
 ebooklib
 uuid
 Pillow
+requests
+requests-html
