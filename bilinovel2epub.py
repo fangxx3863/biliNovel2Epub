@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import time
 import requests
+from requests_html import HTMLSession
 import pickle
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
@@ -23,7 +24,8 @@ import multiprocessing
 #set_start_method('spawn', force=True)
 
 console = Console()
-session = requests.Session()
+#session = requests.Session()
+session = HTMLSession()
 # 关闭SSL证书验证
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -358,7 +360,9 @@ def 主要():
                         console.print("[red]错误次数过多!已终止运行!")
                         os._exit(0)
                     try:
-                        soup = BeautifulSoup(session.get(单章URL,headers=HEARDERS,timeout=5).text, "lxml")
+                        页面 = session.get(下一个URL,headers=HEARDERS,timeout=5)
+                        页面.html.render()
+                        soup = BeautifulSoup(页面.html.html, features="lxml")
                     except:
                         console.print(f"第{i + 1}次请求失败,正在重试...")
                         time.sleep(3)
@@ -494,3 +498,4 @@ if __name__ == "__main__":
     os.remove("content.pickle")
     os.remove("images.pickle")
     os.remove("info.pickle")
+ 
