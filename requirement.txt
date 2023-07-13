@@ -6,3 +6,4 @@ uuid
 Pillow
 requests
 requests-html
+selenium
