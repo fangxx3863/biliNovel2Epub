@@ -196,6 +196,9 @@ def 标准化JSON(s:str)->dict:
     return obj
 
 def clean_file_name(filename:str):
+    if ".jpg?" in filename:
+        parts = filename.split(".jpg?")
+        filename = parts[0] + ".jpg"
     invalid_chars='[\\\:*?"<>|]'
     replace_char='-'
     return re.sub(invalid_chars,replace_char,filename)
